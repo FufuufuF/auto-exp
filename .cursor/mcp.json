@@ -1,0 +1,12 @@
+{
+    "mcpServers": {
+        "richtext-reader": {
+            "command": "uv",
+            "args": [
+                "run",
+                "mcp/richtext_reader.py"
+            ],
+            "cwd": "${workspaceFolder}"
+        }
+    }
+}
