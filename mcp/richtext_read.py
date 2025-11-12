@@ -5,12 +5,16 @@ from mcp.server import FastMCP
 from openai import OpenAI
 from pathlib import Path
 
+from docx import Document
+from docx.text.paragraph import Paragraph
+from docx.table import Table
+
+from src.micorsoft_office_reader import MicrosoftOfficeReader
+
 app = FastMCP("richtext-read")
 
-system_prompt = """你是一个文档阅读助手, 负责将文档内容转化为markdown格式, 只返回markdown源码"""
-
-@app.tool()
-def read_richtext(file_path: str) -> str:
+def read_richtext_with_LLM(file_path: str) -> str:
+    system_prompt = """你是一个文档阅读助手, 负责将文档内容转化为markdown格式, 只返回markdown源码"""
     try:
         load_dotenv()
         base_url = os.getenv("QWEN_BASE_URL")
@@ -57,6 +61,24 @@ def read_richtext(file_path: str) -> str:
     except Exception as e:
         print(f"读取文档失败: {e}")
         return f"读取文档失败: {e}"
+
+@app.tool()
+def read_richtext(file_path: str, read_method: str = "py") -> str:
+    if read_method == "py":
+        file_type = file_path.split(".")[-1]
+        if file_type == "docx":
+            return MicrosoftOfficeReader.read_microsoft_word(file_path)
+        elif file_type == "pdf":
+            return MicrosoftOfficeReader.read_microsoft_pdf(file_path)
+        elif file_type == "pptx":
+            return MicrosoftOfficeReader.read_microsoft_ppt(file_path)
+        else:
+            raise ValueError(f"不支持的文件类型: {file_type}")
+        
+    elif read_method == "LLM":
+        return read_richtext_with_LLM(file_path)
+    else:
+        raise ValueError(f"不支持的阅读方法: {read_method}")
 
 if __name__ == "__main__":
     app.run(transport="stdio")
