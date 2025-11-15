@@ -6,15 +6,11 @@ from mcp.server import FastMCP
 from openai import OpenAI
 from pathlib import Path
 
-from docx import Document
-from docx.text.paragraph import Paragraph
-from docx.table import Table
-
 # 添加项目根目录到 Python 路径
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.micorsoft_office_reader import MicrosoftOfficeReader
+from src.utils.micorsoft_office_reader import MicrosoftOfficeReader
 
 app = FastMCP("richtext-read")
 
